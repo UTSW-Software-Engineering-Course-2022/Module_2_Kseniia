@@ -15,7 +15,7 @@ m.pm.Vdh.V0 = 0.02;
 m_coord = m.var.coord;
 n_iter = 20;
 kc = 100;
-ks = 0.001; %100 makes surface irregular, 0.001 makes it flat? use 0.0001
+ks = 0.001; 
 kv = 100;
 m.pm.k_c = kc;
 r=mean(sqrt(sum(m.var.coord(:,1).^2+m.var.coord(:,2).^2+m.var.coord(:,3).^2,2)));
@@ -47,7 +47,7 @@ for iter=1:n_iter
         f_of_l(ii) = Fi.fn(X_idx(ii));
     end
 
-    %compute F for each vortex of each edge and store in Fs
+    %compute Ftotal
     
     Ftotal = zeros(length(m_coord), 3);
     for vortex=1:length(m_coord);
@@ -78,11 +78,12 @@ for iter=1:n_iter
     end
     
     
-    %compute Fb
+    
     delta_x = 0.000001;
     delta_y = 0.000001;
     delta_z = 0.000001;
-          
+    
+    %compute Fb   
     Fb= zeros(162, 3);
     for i=1:162;
         %compute x axis
@@ -135,7 +136,7 @@ for iter=1:n_iter
     end
     %quiver3(m.var.coord(:,1), m.var.coord(:,1), m.var.coord(:,3), Fa(:,1), Fa(:,2), Fa(:,3))
     
-    %compute Fv
+   
     %Fv = kv*((V-V0)^2)/V0
     Fv = zeros(162,3);
     for i=1:162;
@@ -159,14 +160,14 @@ for iter=1:n_iter
     end
     %quiver3(m.var.coord(:,1), m.var.coord(:,1), m.var.coord(:,3), Fv(:,1), Fv(:,2), Fv(:,3))
     
-    %add random force
+    %compute random force
     k = 0;
     F_random = k*randn(length(m.var.coord), 3);
     
     Ftotal = Ftotal+F_random+Fv+Fa+Fb;
-    %Ftotal = Ftotal+F_random+Fb;
     
-    %compute deltat_final
+    
+    %compute delta t final
     delt_t_all = zeros(1, length(X_idx));
     for ii=1:length(X_idx);
         i = m.var.edge_all(ii, 1);
@@ -197,7 +198,7 @@ for iter=1:n_iter
     
     m_coord = m_coord+m.pm.mu*Ftotal*delta_t_final;
     m.var.coord=m_coord;
-    std(l)
+    
     stds(iter) = std(l);
     
     rLim=(min(Fi.rg, max(Fi.rg)));
@@ -206,20 +207,8 @@ for iter=1:n_iter
     
 end
 
-m.var.coord = m_coord;
 
-
-
-%%
-
-quiver3(m.var.coord(:,1), m.var.coord(:,1), m.var.coord(:,3), Fb(:,1), Fb(:,2), Fb(:,3))
-
-%%
-m.var.coord(i,1):Fa(i,1)
-%%
-plot(1:n_iter, stds)
-%%
-%Plot the membranel 'm'. Note that Matlab autonatically recognize m is an 'object' and apply m's own plot function  
+%Plot the membranel 'm'.  
 fig=figure;
 subplot(1,2,1);
 plot(m,'f',fig);
