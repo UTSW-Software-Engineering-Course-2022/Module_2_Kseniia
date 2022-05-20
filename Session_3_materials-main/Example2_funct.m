@@ -17,38 +17,36 @@ m_coord = m.var.coord;
 n_iter = 2
 stds = zeros(n_iter, 1);
 for iter=1:n_iter
-    %calculate l for each edge
+    %calculate length of each edge
     l = edge_length(m_coord, m.var.edge_all);
 
     X_idx, f_of_l = X_idx_and_f_of_l(Fi, l);
 
-    %compute F for each vortex of each edge and store in Fs
+    %compute F total
     Ftotal=comp_Ftotal(m, m_coord, f_of_l, l);
     
-    %compute deltat_final
+    %compute delta t final
     delta_t_final = comp_delta_final(X_idx, m, l, Fi, m_coord, Ftotal)
     
-    %add random force
+    %compute random force
     k = 0;
-    
     F_random = k*randn(length(m.var.coord), 3);
+    
     Ftotal = Ftotal+F_random;
-
     m_coord = m_coord+m.pm.mu*Ftotal*delta_t_final;
-    std(l)
+    m.var.coord = m_coord;
     stds(iter) = std(l);
     
 end
 
-m.var.coord = m_coord;
+
 %%
 plot(1:n_iter, stds)
-%% Plot the membranel 'm'. Note that Matlab autonatically recognize m is an 'object' and apply m's own plot function  
+%% Plot the membranel 'm'.
 fig=figure;
 subplot(1,2,1);
 plot(m,'f',fig);
 subplot(1,2,2);
 col=rand(m.var.n_coord,3);
 plot(m,'f',fig,'col',col,'col_min',0,'col_max',1,'colBar',true);
-%--------------------------------------------------------------------------
 
